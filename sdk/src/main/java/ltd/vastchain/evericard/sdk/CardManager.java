@@ -9,11 +9,13 @@ import android.view.WindowManager;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
+import ltd.vastchain.evericard.sdk.channels.AndroidNFCEveriCardChannel;
 import ltd.vastchain.evericard.sdk.viewModels.CardStateViewModel;
 
 public class CardManager {
     private FragmentActivity activity;
     private CardStateViewModel cardState;
+    private OnCardSwipeListener onCardSwipeListener;
 
     private static String[][] TECH_LISTS;
     private static IntentFilter[] FILTERS;
@@ -30,6 +32,7 @@ public class CardManager {
     public CardManager(FragmentActivity activity) {
         this.activity = activity;
         this.cardState = ViewModelProviders.of(activity).get(CardStateViewModel.class);
+        initState();
     }
 
     public void onActivityResume() {
@@ -43,16 +46,30 @@ public class CardManager {
         activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
+    public void setOnCardSwipeListener(OnCardSwipeListener listener) {
+        this.onCardSwipeListener = listener;
+    }
+
     public void onActivityNewIntent(Intent intent) {
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
-            this.cardState.parcelableExtra = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            this.cardState.cardChannel = new AndroidNFCEveriCardChannel(intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
+            Card card = new Card(this.cardState.cardChannel);
+
+            // check if the card is everiCard
+            if (this.onCardSwipeListener != null) {
+                this.onCardSwipeListener.onCardSwipe(this, card);
+            }
         }
+    }
+
+    public interface OnCardSwipeListener {
+        boolean onCardSwipe(CardManager cardManager, Card card);
     }
 
     private void initState() {
         if (!this.cardState.isInitialized) {
             this.cardState.nfcAdapter = NfcAdapter.getDefaultAdapter(activity);
-            this.cardState.pendingIntent = PendingIntent.getActivity(activity, 0, new Intent(activity, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+            this.cardState.pendingIntent = PendingIntent.getActivity(activity, 0, new Intent(activity, activity.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
             this.cardState.isInitialized = true;
         }
     }
