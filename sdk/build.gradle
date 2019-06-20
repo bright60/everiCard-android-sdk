@@ -22,9 +22,9 @@ android {
 }
 
 dependencies {
-    def lifecycle_version = "2.0.0"
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+     def lifecycle_version = "2.0.0"
     // ViewModel and LiveData
+    testImplementation 'junit:junit:4.12'
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-    implementation files('libs/chain-sdk-1.0.1-jar-with-dependencies.jar')
+    implementation "io.everitoken.sdk:chain-sdk:1.2.0"
 }
