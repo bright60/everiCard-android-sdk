@@ -60,4 +60,8 @@ public class Command implements CommandInterface {
 
         return result;
     }
+
+    public static byte flagConfigurationItem(byte b) {
+        return (byte) (0x80 | b);
+    }
 }

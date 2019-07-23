@@ -25,6 +25,7 @@ public class Card {
             return key;
         } else {
             throw new VCChipException("get_publicKey_fail", "could not get public key");
+
         }
     }
 }
