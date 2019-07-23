@@ -20,7 +20,6 @@ class ConfigurationItemResponseTest {
         Assertions.assertFalse(configurationItemResponse.isUnlocked());
     }
 
-
     @Test
     void getId() {
         ConfigurationItemResponse configurationItemResponse = new ConfigurationItemResponse(

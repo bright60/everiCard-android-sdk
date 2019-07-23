@@ -18,7 +18,7 @@ public class Command implements CommandInterface {
 
     public Command(byte cla, byte ins, byte p1, byte p2, @Nullable Byte lc, @Nullable byte[] data, @Nullable Byte le) {
 
-        if (lc != null && data != null && lc.intValue() != data.length * 8) {
+        if (lc != null && data != null && lc.intValue() != data.length) {
             throw new IllegalArgumentException("lc and the length of data don't match.");
         }
 
