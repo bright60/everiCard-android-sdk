@@ -36,4 +36,8 @@ public class Response implements ResponseInterface {
     public byte[] getStatus() {
         return status;
     }
+
+    public boolean isEmpty() {
+        return this.getContent().length == 0;
+    }
 }
