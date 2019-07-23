@@ -44,11 +44,10 @@ public class Command implements CommandInterface {
     }
 
     public byte[] getBytes() {
-        byte[] result = new byte[]{};
-        byte[] base = new byte[]{cla, ins, p1, p2};
+        byte[] result = new byte[]{cla, ins, p1, p2};
 
         if (lc != null) {
-            result = ArrayUtils.add(base, lc);
+            result = ArrayUtils.add(result, lc);
         }
 
         if (data != null) {
