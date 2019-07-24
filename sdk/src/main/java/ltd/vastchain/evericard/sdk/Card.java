@@ -25,7 +25,7 @@ public class Card {
         PublicKeyRead publicKeyRead = PublicKeyRead.byIndex(keyIndex);
 
         byte[] ret = channel.sendCommand(publicKeyRead);
-        Response res = new Response(ret);
+        Response res = Response.of(ret);
 
         if (!res.isSuccessful()) {
             throw new VCChipException("get_publicKey_fail", String.format("could not get public key at index %s", keyIndex));
@@ -38,7 +38,7 @@ public class Card {
         ConfigurationRead read = ConfigurationRead.readConfigurationItemData((byte) 0x0a);
 
         byte[] ret = channel.sendCommand(read);
-        Response res = new Response(ret);
+        Response res = Response.of(ret);
 
         if (!res.isSuccessful()) {
             throw new VCChipException("get_display_name_failed", "Failed to get display name");
@@ -49,14 +49,14 @@ public class Card {
     }
 
     public void setDisplayName(String name) throws VCChipException {
-        // todo validate name a bit
+        // TODO: validate name a bit
 
         ConfigurationWrite command = ConfigurationWrite.configureSettings(Arrays.asList(
                 ConfigurationWrite.createTLVSetting((byte) 0x0a, StringEscapeUtils.escapeXml(name).getBytes())
         ), true);
 
         byte[] ret = channel.sendCommand(command);
-        Response res = new Response(ret);
+        Response res = Response.of(ret);
 
         if (!res.isSuccessful()) {
             throw new VCChipException("set_display_name_failed", String.format("Failed to set display name to %s (%s).", name, Utils.HEX.encode(res.getStatus())));

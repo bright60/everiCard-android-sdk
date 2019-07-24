@@ -4,6 +4,8 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
+import javax.annotation.Nullable;
+
 public class Response implements ResponseInterface {
     private final byte[] data;
     private final byte[] status;
@@ -39,5 +41,12 @@ public class Response implements ResponseInterface {
 
     public boolean isEmpty() {
         return this.getContent().length == 0;
+    }
+
+    public static Response of(@Nullable byte[] raw) {
+        if (raw == null) {
+            return new Response(new byte[]{0x00, 0x00});
+        }
+        return new Response(raw);
     }
 }
