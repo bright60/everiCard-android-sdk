@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import ltd.vastchain.evericard.sdk.Card;
 import ltd.vastchain.evericard.sdk.CardManager;
 import ltd.vastchain.evericard.sdk.VCChipException;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     @Override
     protected void onPause() {
         super.onPause();
-         cardManager.onActivityPause();
+        cardManager.onActivityPause();
     }
 
     @Override
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         } catch (VCChipException e) {
             e.printStackTrace();
         }
+       
         return false;
     }
 }
