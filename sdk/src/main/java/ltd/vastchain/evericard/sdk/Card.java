@@ -2,7 +2,7 @@ package ltd.vastchain.evericard.sdk;
 
 import io.everitoken.sdk.java.PublicKey;
 import ltd.vastchain.evericard.sdk.channels.EveriCardChannel;
-import ltd.vastchain.evericard.sdk.command.Command;
+import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.response.Response;
 
 public class Card {
@@ -12,18 +12,16 @@ public class Card {
         this.channel = channel;
     }
 
-    public PublicKey getPublicKey(int keyIndex) throws VCChipException {
-        Command command = new Command((byte) 0x80, (byte) 0x0b, (byte) 0x00, (byte) 0x00, (byte) 0x41); //"800b000041";
-//        ConfigurationRead read = ConfigurationRead.readConfigurationItem((byte) 0x0a);
+    public PublicKey getPublicKeyByIndex(int keyIndex) throws VCChipException {
+        PublicKeyRead publicKeyRead = PublicKeyRead.byIndex(keyIndex);
 
-        byte[] ret = channel.sendCommand(command);
+        byte[] ret = channel.sendCommand(publicKeyRead);
         Response res = new Response(ret);
-        if (res.isSuccessful()) {
-            PublicKey key = new PublicKey(res.getContent());
-            return key;
-        } else {
+
+        if (!res.isSuccessful()) {
             throw new VCChipException("get_publicKey_fail", "could not get public key");
         }
 
+        return new PublicKey(res.getContent());
     }
 }

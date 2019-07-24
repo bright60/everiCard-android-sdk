@@ -43,12 +43,14 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     @Override
     public boolean onCardSwipe(CardManager cardManager, Card card) {
         try {
-            Toast.makeText(this, "卡已连接", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, card.getPublicKey(0).toString(), Toast.LENGTH_LONG).show();
+            String key0 = card.getPublicKeyByIndex(0).toString();
+            String key1 = card.getPublicKeyByIndex(1).toString();
+
+            Toast.makeText(this, String.format("%s, %s", key0, key1), Toast.LENGTH_LONG).show();
         } catch (VCChipException e) {
             e.printStackTrace();
         }
-       
+
         return false;
     }
 }
