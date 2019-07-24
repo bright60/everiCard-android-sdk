@@ -43,6 +43,12 @@
                     android:layout_height="wrap_content"
                     android:text="set display name" />
 
+                <Button
+                    android:id="@+id/verifyPin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="verify pin" />
+
             </LinearLayout>
         </ScrollView>
 

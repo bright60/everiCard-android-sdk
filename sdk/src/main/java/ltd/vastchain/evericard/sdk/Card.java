@@ -12,6 +12,7 @@ import ltd.vastchain.evericard.sdk.channels.EveriCardChannel;
 import ltd.vastchain.evericard.sdk.command.ConfigurationRead;
 import ltd.vastchain.evericard.sdk.command.ConfigurationWrite;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
+import ltd.vastchain.evericard.sdk.command.VerifyPin;
 import ltd.vastchain.evericard.sdk.response.Response;
 
 public class Card {
@@ -61,5 +62,14 @@ public class Card {
         if (!res.isSuccessful()) {
             throw new VCChipException("set_display_name_failed", String.format("Failed to set display name to %s (%s).", name, Utils.HEX.encode(res.getStatus())));
         }
+    }
+
+    public boolean verifyPin(String pinInHex) {
+        VerifyPin command = VerifyPin.of(Utils.HEX.decode(pinInHex));
+
+        byte[] ret = channel.sendCommand(command);
+        Response res = Response.of(ret);
+
+        return res.isSuccessful();
     }
 }

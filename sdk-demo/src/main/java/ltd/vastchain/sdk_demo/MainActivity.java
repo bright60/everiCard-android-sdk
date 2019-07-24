@@ -1,6 +1,7 @@
 package ltd.vastchain.sdk_demo;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -8,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ltd.vastchain.evericard.sdk.Card;
@@ -19,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button getPubKey0;
     private Button getDisplayName;
     private Button setDisplayName;
-    private EditText commandInput;
+    private Button verifyPin;
     private TextView outputText;
     private Card card;
 
@@ -27,11 +29,11 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         setContentView(R.layout.activity_main);
         getPubKey0 = (Button) findViewById(R.id.getPubKey0);
         getDisplayName = (Button) findViewById(R.id.getDisplayName);
         setDisplayName = (Button) findViewById(R.id.setDisplayName);
+        verifyPin = (Button) findViewById(R.id.verifyPin);
         outputText = (TextView) findViewById(R.id.outputText);
         outputText.setTextIsSelectable(true);
 
@@ -44,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         });
         setDisplayName.setOnClickListener((v) -> {
             this.handleClick(this, "set_display_name");
+        });
+        verifyPin.setOnClickListener(v -> {
+            this.handleClick(this, "verify_pin");
         });
 
         cardManager.setOnCardSwipeListener(this);
@@ -58,6 +63,28 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     this.outputText.setText(card.getDisplayName());
                 } else if (command.equals("set_display_name")) {
                     card.setDisplayName("杭州宇链科技有限公司");
+                } else if (command.equals("verify_pin")) {
+                    final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
+                    inputAlert.setTitle("验证密码");
+                    inputAlert.setMessage("输入密码的hex值");
+                    final EditText userInput = new EditText(ctx);
+                    inputAlert.setView(userInput);
+                    inputAlert.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String userInputValue = userInput.getText().toString();
+                            boolean success = card.verifyPin(userInputValue);
+                            outputText.setText(success ? "Verified" : "Invalid");
+                        }
+                    });
+                    inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = inputAlert.create();
+                    alertDialog.show();
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();
                 }

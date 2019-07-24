@@ -44,7 +44,7 @@ public class Response implements ResponseInterface {
     }
 
     public static Response of(@Nullable byte[] raw) {
-        if (raw == null) {
+        if (raw == null || raw.length == 0) {
             return new Response(new byte[]{0x00, 0x00});
         }
         return new Response(raw);
