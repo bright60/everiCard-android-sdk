@@ -5,7 +5,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import javax.annotation.Nullable;
 
 public class Command implements CommandInterface {
-    static final byte CLA = (byte) 0x80;
 
     private final byte cla;
     private final byte ins; // instruction sequence
@@ -31,16 +30,16 @@ public class Command implements CommandInterface {
         this.le = le;
     }
 
-    public Command(byte ins, byte p1, byte p2) {
-        this(Command.CLA, ins, p1, p2, (byte) 0x00, null, null);
+    public Command(byte cla, byte ins, byte p1, byte p2) {
+        this(cla, ins, p1, p2, (byte) 0x00, null, null);
     }
 
-    public Command(byte ins, byte p1, byte p2, byte lc, byte[] data) {
-        this(Command.CLA, ins, p1, p2, lc, data, null);
+    public Command(byte cla, byte ins, byte p1, byte p2, byte lc, byte[] data) {
+        this(cla, ins, p1, p2, lc, data, null);
     }
 
-    public Command(byte ins, byte p1, byte p2, byte le) {
-        this(Command.CLA, ins, p1, p2, null, null, le);
+    public Command(byte cla, byte ins, byte p1, byte p2, byte le) {
+        this(cla, ins, p1, p2, null, null, le);
     }
 
     public byte[] getBytes() {

@@ -6,9 +6,10 @@ import java.util.List;
 
 public class ConfigurationWrite extends Command {
     public static byte INS = (byte) 0x06;
+    public static final byte CLA = (byte) 0x80;
 
     public ConfigurationWrite(byte ins, byte p1, byte p2, byte lc, byte[] data) {
-        super(ins, p1, p2, lc, data);
+        super(CLA, ins, p1, p2, lc, data);
     }
 
     public static ConfigurationWrite configureSettings(List<byte[]> settings, boolean hasSettingData) {
