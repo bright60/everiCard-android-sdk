@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">everiCard SDK Demo</string>
+    <string name="mainBtn">Button</string>
 </resources>
