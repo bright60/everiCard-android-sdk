@@ -16,6 +16,9 @@ import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.command.VerifyPin;
 import ltd.vastchain.evericard.sdk.response.ConfigurationResponse;
+import ltd.vastchain.evericard.sdk.response.IdentityIssuerResponse;
+import ltd.vastchain.evericard.sdk.response.IdentityProducerResponse;
+import ltd.vastchain.evericard.sdk.response.PreferenceProducerResponse;
 import ltd.vastchain.evericard.sdk.response.Response;
 
 public class Card {
@@ -74,12 +77,18 @@ public class Card {
         return res.isSuccessful();
     }
 
-    public String getIdentityProducer() {
+    public String getIdentityProducer() throws VCChipException {
         byte[] random = Utils.random32Bytes();
         IdentityProducerRead command = IdentityProducerRead.of(random);
 
         byte[] ret = channel.sendCommand(command);
-        return Utils.HEX.encode(ret);
+        IdentityProducerResponse res = new IdentityProducerResponse(ret, random);
+
+        if (!res.isSuccessful()) {
+            throw new VCChipException("get_identity_producer_failed", "Failed to get producer identity");
+        }
+
+        return Utils.HEX.encode(res.getContent());
     }
 
     public String getIdentityIssuer() {
@@ -87,13 +96,15 @@ public class Card {
         IdentityIssuerRead command = IdentityIssuerRead.of(random);
 
         byte[] ret = channel.sendCommand(command);
-        return Utils.HEX.encode(ret);
+        IdentityIssuerResponse res = new IdentityIssuerResponse(ret, random);
+        return Utils.HEX.encode(res.getContent());
     }
 
     public String getPreferenceProducer() {
         PreferenceProducerRead command = new PreferenceProducerRead();
 
         byte[] ret = channel.sendCommand(command);
-        return Utils.HEX.encode(ret);
+        PreferenceProducerResponse res = new PreferenceProducerResponse(ret);
+        return Utils.HEX.encode(res.getContent());
     }
 }
