@@ -1,7 +1,6 @@
 package ltd.vastchain.evericard.sdk;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -13,6 +12,7 @@ import ltd.vastchain.evericard.sdk.command.ConfigurationRead;
 import ltd.vastchain.evericard.sdk.command.ConfigurationWrite;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.command.VerifyPin;
+import ltd.vastchain.evericard.sdk.response.ConfigurationResponse;
 import ltd.vastchain.evericard.sdk.response.Response;
 
 public class Card {
@@ -39,19 +39,17 @@ public class Card {
         ConfigurationRead read = ConfigurationRead.readConfigurationItemData((byte) 0x0a);
 
         byte[] ret = channel.sendCommand(read);
-        Response res = Response.of(ret);
+        ConfigurationResponse res = new ConfigurationResponse(ret);
 
         if (!res.isSuccessful()) {
             throw new VCChipException("get_display_name_failed", "Failed to get display name");
         }
 
-        String utf = new String(ArrayUtils.subarray(res.getContent(), 4, res.getContent().length), StandardCharsets.UTF_8);
+        String utf = new String(res.getConfigurationData(), StandardCharsets.UTF_8);
         return StringEscapeUtils.unescapeXml(utf);
     }
 
     public void setDisplayName(String name) throws VCChipException {
-        // TODO: validate name a bit
-
         ConfigurationWrite command = ConfigurationWrite.configureSettings(Arrays.asList(
                 ConfigurationWrite.createTLVSetting((byte) 0x0a, StringEscapeUtils.escapeXml(name).getBytes())
         ), true);

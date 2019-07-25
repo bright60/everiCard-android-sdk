@@ -1,10 +1,21 @@
 package ltd.vastchain.evericard.sdk.response;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.nio.ByteBuffer;
 
-public class ConfigurationItemResponse extends Response {
-    public ConfigurationItemResponse(byte[] raw) {
+public class ConfigurationResponse extends Response {
+    public boolean hasConfigurationData;
+    public byte[] configurationData = new byte[]{};
+
+    public ConfigurationResponse(byte[] raw) {
         super(raw);
+        byte[] content = this.getContent();
+        hasConfigurationData = content.length > 3;
+
+        if (hasConfigurationData) {
+            configurationData = ArrayUtils.subarray(content, 3, content.length);
+        }
     }
 
     public boolean isActivated() {
@@ -33,5 +44,14 @@ public class ConfigurationItemResponse extends Response {
         }
 
         return ByteBuffer.wrap(this.getContent()).get(0);
+    }
+
+    public byte[] getConfigurationDataWithLength() {
+        return configurationData;
+    }
+
+    public byte[] getConfigurationData() {
+        byte[] data = this.getConfigurationDataWithLength();
+        return ArrayUtils.subarray(data, 1, data.length);
     }
 }
