@@ -62,7 +62,31 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                 } else if (command.equals("get_display_name")) {
                     this.outputText.setText(card.getDisplayName());
                 } else if (command.equals("set_display_name")) {
-                    card.setDisplayName("杭州宇链科技有限公司");
+                    final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
+                    inputAlert.setTitle("Set Display Name");
+                    final EditText userInput = new EditText(ctx);
+                    inputAlert.setView(userInput);
+                    inputAlert.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String userInputValue = userInput.getText().toString();
+                            if (userInputValue.length() > 0) {
+                                try {
+                                    card.setDisplayName(userInputValue);
+                                } catch (VCChipException ex) {
+                                    Toast.makeText(ctx, ex.toString(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    });
+                    inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = inputAlert.create();
+                    alertDialog.show();
                 } else if (command.equals("verify_pin")) {
                     final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
                     inputAlert.setTitle("验证密码");
