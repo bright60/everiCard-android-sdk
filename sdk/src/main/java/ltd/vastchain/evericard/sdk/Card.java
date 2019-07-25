@@ -10,6 +10,7 @@ import io.everitoken.sdk.java.Utils;
 import ltd.vastchain.evericard.sdk.channels.EveriCardChannel;
 import ltd.vastchain.evericard.sdk.command.ConfigurationRead;
 import ltd.vastchain.evericard.sdk.command.ConfigurationWrite;
+import ltd.vastchain.evericard.sdk.command.CreationEnd;
 import ltd.vastchain.evericard.sdk.command.IdentityIssuerRead;
 import ltd.vastchain.evericard.sdk.command.IdentityProducerRead;
 import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
@@ -106,5 +107,15 @@ public class Card {
         byte[] ret = channel.sendCommand(command);
         PreferenceProducerResponse res = new PreferenceProducerResponse(ret);
         return Utils.HEX.encode(res.getContent());
+    }
+
+    public void endCreation() throws VCChipException {
+        CreationEnd command = new CreationEnd();
+        byte[] ret = channel.sendCommand(command);
+        Response res = Response.of(ret);
+
+        if (!res.isSuccessful()) {
+            throw new VCChipException("creation_end_failed", String.format("Failed to on creation end command (%s).", Utils.HEX.encode(res.getStatus())));
+        }
     }
 }

@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button getIdentityProducer;
     private Button getPrefProducer;
     private Button getIdentityIssuer;
+    private Button creationEnd;
     private TextView outputText;
     private Card card;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         getIdentityProducer = (Button) findViewById(R.id.getIdentityProducer);
         getPrefProducer = (Button) findViewById(R.id.getPrefProducer);
         getIdentityIssuer = (Button) findViewById(R.id.getIdentityIssuer);
+        creationEnd = (Button) findViewById(R.id.creationEnd);
         outputText = (TextView) findViewById(R.id.outputText);
         outputText.setTextIsSelectable(true);
 
@@ -64,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         });
         getIdentityIssuer.setOnClickListener(v -> {
             this.handleClick(this, "get_identity_issuer");
+        });
+        creationEnd.setOnClickListener(v -> {
+            this.handleClick(this, "creation_end");
         });
 
         cardManager.setOnCardSwipeListener(this);
@@ -130,6 +135,8 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     this.outputText.setText(card.getPreferenceProducer());
                 } else if (command.equals("get_identity_issuer")) {
                     this.outputText.setText(card.getIdentityIssuer());
+                } else if (command.equals("creation_end")) {
+                    card.endCreation();
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();
                 }

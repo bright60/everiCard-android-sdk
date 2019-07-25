@@ -67,6 +67,12 @@
                     android:layout_height="wrap_content"
                     android:text="Get Issuer Identity" />
 
+                <Button
+                    android:id="@+id/creationEnd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create end" />
+
             </LinearLayout>
         </ScrollView>
 
