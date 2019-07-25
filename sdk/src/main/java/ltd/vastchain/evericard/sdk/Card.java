@@ -10,6 +10,9 @@ import io.everitoken.sdk.java.Utils;
 import ltd.vastchain.evericard.sdk.channels.EveriCardChannel;
 import ltd.vastchain.evericard.sdk.command.ConfigurationRead;
 import ltd.vastchain.evericard.sdk.command.ConfigurationWrite;
+import ltd.vastchain.evericard.sdk.command.IdentityIssuerRead;
+import ltd.vastchain.evericard.sdk.command.IdentityProducerRead;
+import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.command.VerifyPin;
 import ltd.vastchain.evericard.sdk.response.ConfigurationResponse;
@@ -69,5 +72,28 @@ public class Card {
         Response res = Response.of(ret);
 
         return res.isSuccessful();
+    }
+
+    public String getIdentityProducer() {
+        byte[] random = Utils.random32Bytes();
+        IdentityProducerRead command = IdentityProducerRead.of(random);
+
+        byte[] ret = channel.sendCommand(command);
+        return Utils.HEX.encode(ret);
+    }
+
+    public String getIdentityIssuer() {
+        byte[] random = Utils.random32Bytes();
+        IdentityIssuerRead command = IdentityIssuerRead.of(random);
+
+        byte[] ret = channel.sendCommand(command);
+        return Utils.HEX.encode(ret);
+    }
+
+    public String getPreferenceProducer() {
+        PreferenceProducerRead command = new PreferenceProducerRead();
+
+        byte[] ret = channel.sendCommand(command);
+        return Utils.HEX.encode(ret);
     }
 }

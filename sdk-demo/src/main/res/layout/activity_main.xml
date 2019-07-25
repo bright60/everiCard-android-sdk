@@ -49,6 +49,24 @@
                     android:layout_height="wrap_content"
                     android:text="verify pin" />
 
+                <Button
+                    android:id="@+id/getIdentityProducer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Get Producer Identity" />
+
+                <Button
+                    android:id="@+id/getPrefProducer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Get Producer Pref." />
+
+                <Button
+                    android:id="@+id/getIdentityIssuer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Get Issuer Identity" />
+
             </LinearLayout>
         </ScrollView>
 

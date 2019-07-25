@@ -22,6 +22,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button getDisplayName;
     private Button setDisplayName;
     private Button verifyPin;
+    private Button getIdentityProducer;
+    private Button getPrefProducer;
+    private Button getIdentityIssuer;
     private TextView outputText;
     private Card card;
 
@@ -34,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         getDisplayName = (Button) findViewById(R.id.getDisplayName);
         setDisplayName = (Button) findViewById(R.id.setDisplayName);
         verifyPin = (Button) findViewById(R.id.verifyPin);
+        getIdentityProducer = (Button) findViewById(R.id.getIdentityProducer);
+        getPrefProducer = (Button) findViewById(R.id.getPrefProducer);
+        getIdentityIssuer = (Button) findViewById(R.id.getIdentityIssuer);
         outputText = (TextView) findViewById(R.id.outputText);
         outputText.setTextIsSelectable(true);
 
@@ -49,6 +55,15 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         });
         verifyPin.setOnClickListener(v -> {
             this.handleClick(this, "verify_pin");
+        });
+        getIdentityProducer.setOnClickListener(v -> {
+            this.handleClick(this, "get_identity_producer");
+        });
+        getPrefProducer.setOnClickListener(v -> {
+            this.handleClick(this, "get_pref_producer");
+        });
+        getIdentityIssuer.setOnClickListener(v -> {
+            this.handleClick(this, "get_identity_issuer");
         });
 
         cardManager.setOnCardSwipeListener(this);
@@ -109,6 +124,12 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     });
                     AlertDialog alertDialog = inputAlert.create();
                     alertDialog.show();
+                } else if (command.equals("get_identity_producer")) {
+                    this.outputText.setText(card.getIdentityProducer());
+                } else if (command.equals("get_pref_producer")) {
+                    this.outputText.setText(card.getPreferenceProducer());
+                } else if (command.equals("get_identity_issuer")) {
+                    this.outputText.setText(card.getIdentityIssuer());
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();
                 }
