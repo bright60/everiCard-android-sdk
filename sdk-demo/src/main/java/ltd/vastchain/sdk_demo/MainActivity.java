@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                 } else if (command.equals("modify_pin")) {
                     final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
                     inputAlert.setTitle("Modify Pin");
-                    inputAlert.setMessage("Set new pin");
+                    inputAlert.setMessage("Format: oldPin,newPin (hex)");
                     final EditText pin = new EditText(ctx);
                     inputAlert.setView(pin);
                     inputAlert.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
