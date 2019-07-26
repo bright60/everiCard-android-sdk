@@ -15,12 +15,14 @@ import ltd.vastchain.evericard.sdk.command.IdentityIssuerRead;
 import ltd.vastchain.evericard.sdk.command.IdentityProducerRead;
 import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
+import ltd.vastchain.evericard.sdk.command.SeedBackup;
 import ltd.vastchain.evericard.sdk.command.VerifyPin;
 import ltd.vastchain.evericard.sdk.response.ConfigurationResponse;
 import ltd.vastchain.evericard.sdk.response.IdentityIssuerResponse;
 import ltd.vastchain.evericard.sdk.response.IdentityProducerResponse;
 import ltd.vastchain.evericard.sdk.response.PreferenceProducerResponse;
 import ltd.vastchain.evericard.sdk.response.Response;
+import ltd.vastchain.evericard.sdk.response.SeedBackupResponse;
 
 public class Card {
     private EveriCardChannel channel;
@@ -117,5 +119,17 @@ public class Card {
         if (!res.isSuccessful()) {
             throw new VCChipException("creation_end_failed", String.format("Failed to on creation end command (%s).", Utils.HEX.encode(res.getStatus())));
         }
+    }
+
+    public String getSeedBackup() throws VCChipException {
+        SeedBackup command = new SeedBackup();
+        byte[] ret = channel.sendCommand(command);
+        SeedBackupResponse res = new SeedBackupResponse(ret);
+
+        if (!res.isSuccessful()) {
+            throw new VCChipException("backup_seed_failed", String.format("Failed to back up seed (%s).", Utils.HEX.encode(res.getStatus())));
+        }
+
+        return res.isValid() ? "valid" : "invalid";
     }
 }

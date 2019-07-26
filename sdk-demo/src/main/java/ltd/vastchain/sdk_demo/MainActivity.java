@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button getPrefProducer;
     private Button getIdentityIssuer;
     private Button creationEnd;
+    private Button seedBackup;
     private TextView outputText;
     private Card card;
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         getPrefProducer = (Button) findViewById(R.id.getPrefProducer);
         getIdentityIssuer = (Button) findViewById(R.id.getIdentityIssuer);
         creationEnd = (Button) findViewById(R.id.creationEnd);
+        seedBackup = (Button) findViewById(R.id.seedBackup);
         outputText = (TextView) findViewById(R.id.outputText);
         outputText.setTextIsSelectable(true);
 
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         });
         creationEnd.setOnClickListener(v -> {
             this.handleClick(this, "creation_end");
+        });
+        seedBackup.setOnClickListener(v -> {
+            this.handleClick(this, "seed_backup");
         });
 
         cardManager.setOnCardSwipeListener(this);
@@ -137,6 +142,8 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     this.outputText.setText(card.getIdentityIssuer());
                 } else if (command.equals("creation_end")) {
                     card.endCreation();
+                } else if (command.equals("seed_backup")) {
+                    this.outputText.setText(card.getSeedBackup());
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();
                 }

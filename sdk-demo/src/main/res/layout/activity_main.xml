@@ -73,6 +73,12 @@
                     android:layout_height="wrap_content"
                     android:text="Create end" />
 
+                <Button
+                    android:id="@+id/seedBackup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="backup seed" />
+
             </LinearLayout>
         </ScrollView>
 
