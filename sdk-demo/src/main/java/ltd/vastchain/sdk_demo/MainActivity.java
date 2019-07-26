@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import io.everitoken.sdk.java.Utils;
 import ltd.vastchain.evericard.sdk.Card;
 import ltd.vastchain.evericard.sdk.CardManager;
 import ltd.vastchain.evericard.sdk.VCChipException;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button getDisplayName;
     private Button setDisplayName;
     private Button verifyPin;
+    private Button modifyPin;
     private Button getIdentityProducer;
     private Button getPrefProducer;
     private Button getIdentityIssuer;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         getDisplayName = (Button) findViewById(R.id.getDisplayName);
         setDisplayName = (Button) findViewById(R.id.setDisplayName);
         verifyPin = (Button) findViewById(R.id.verifyPin);
+        modifyPin = (Button) findViewById(R.id.modifyPin);
         getIdentityProducer = (Button) findViewById(R.id.getIdentityProducer);
         getPrefProducer = (Button) findViewById(R.id.getPrefProducer);
         getIdentityIssuer = (Button) findViewById(R.id.getIdentityIssuer);
@@ -74,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         });
         seedBackup.setOnClickListener(v -> {
             this.handleClick(this, "seed_backup");
+        });
+        modifyPin.setOnClickListener(v -> {
+            this.handleClick(this, "modify_pin");
         });
 
         cardManager.setOnCardSwipeListener(this);
@@ -144,6 +150,31 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     card.endCreation();
                 } else if (command.equals("seed_backup")) {
                     this.outputText.setText(card.getSeedBackup());
+                } else if (command.equals("modify_pin")) {
+                    final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
+                    inputAlert.setTitle("Modify Pin");
+                    inputAlert.setMessage("Set new pin");
+                    final EditText pin = new EditText(ctx);
+                    inputAlert.setView(pin);
+                    inputAlert.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String pinText = pin.getText().toString();
+                            String[] pins = pinText.split(",");
+                            byte[] oldPinHex = Utils.HEX.decode(pins[0]);
+                            byte[] newPinHex = Utils.HEX.decode(pins[1]);
+                            boolean success = card.modifyPin(oldPinHex, newPinHex);
+                            outputText.setText(success ? "Success" : "Failed");
+                        }
+                    });
+                    inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = inputAlert.create();
+                    alertDialog.show();
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();
                 }

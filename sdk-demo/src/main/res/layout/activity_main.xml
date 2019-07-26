@@ -50,6 +50,12 @@
                     android:text="verify pin" />
 
                 <Button
+                    android:id="@+id/modifyPin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="modify pin" />
+
+                <Button
                     android:id="@+id/getIdentityProducer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -13,6 +13,7 @@ import ltd.vastchain.evericard.sdk.command.ConfigurationWrite;
 import ltd.vastchain.evericard.sdk.command.CreationEnd;
 import ltd.vastchain.evericard.sdk.command.IdentityIssuerRead;
 import ltd.vastchain.evericard.sdk.command.IdentityProducerRead;
+import ltd.vastchain.evericard.sdk.command.ModifyPin;
 import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.command.SeedBackup;
@@ -75,6 +76,15 @@ public class Card {
         VerifyPin command = VerifyPin.of(Utils.HEX.decode(pinInHex));
 
         byte[] ret = channel.sendCommand(command);
+        Response res = Response.of(ret);
+
+        return res.isSuccessful();
+    }
+
+    public boolean modifyPin(byte[] oldPin, byte[] newPin) {
+        ModifyPin command = ModifyPin.of(oldPin, newPin);
+        byte[] ret = channel.sendCommand(command);
+
         Response res = Response.of(ret);
 
         return res.isSuccessful();
