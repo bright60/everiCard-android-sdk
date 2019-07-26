@@ -22,6 +22,7 @@ public class SeedBackupResponse extends Response {
         this.mac = ArrayUtils.subarray(content, content.length - 4, content.length);
     }
 
+    // a network call to vastchain cloud
     public boolean isValid() {
         // TODO, current implementation is wrong. Need to implement own hash function
         SHA256Digest sha256Digest = new SHA256Digest();
