@@ -85,6 +85,12 @@
                     android:layout_height="wrap_content"
                     android:text="backup seed" />
 
+                <Button
+                    android:id="@+id/signHash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="sign hash" />
+
             </LinearLayout>
         </ScrollView>
 

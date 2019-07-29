@@ -1,12 +1,21 @@
 package ltd.vastchain.evericard.sdk;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import androidx.arch.core.util.Function;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.Sha256Hash;
+
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import io.everitoken.sdk.java.PublicKey;
+import io.everitoken.sdk.java.Signature;
 import io.everitoken.sdk.java.Utils;
+import io.everitoken.sdk.java.dto.Transaction;
 import ltd.vastchain.evericard.sdk.channels.EveriCardChannel;
 import ltd.vastchain.evericard.sdk.command.ConfigurationRead;
 import ltd.vastchain.evericard.sdk.command.ConfigurationWrite;
@@ -17,6 +26,7 @@ import ltd.vastchain.evericard.sdk.command.ModifyPin;
 import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.command.SeedBackup;
+import ltd.vastchain.evericard.sdk.command.SignHash;
 import ltd.vastchain.evericard.sdk.command.VerifyPin;
 import ltd.vastchain.evericard.sdk.response.ConfigurationResponse;
 import ltd.vastchain.evericard.sdk.response.IdentityIssuerResponse;
@@ -32,8 +42,8 @@ public class Card {
         this.channel = channel;
     }
 
-    public PublicKey getPublicKeyByIndex(int keyIndex) throws VCChipException {
-        PublicKeyRead publicKeyRead = PublicKeyRead.byIndex(keyIndex);
+    public PublicKey getPublicKeyByIndexAndSymbolId(int keyIndex, int symbolId) throws VCChipException {
+        PublicKeyRead publicKeyRead = PublicKeyRead.byIndexAndSymbolId(keyIndex, symbolId);
 
         byte[] ret = channel.sendCommand(publicKeyRead);
         Response res = Response.of(ret);
@@ -140,6 +150,71 @@ public class Card {
             throw new VCChipException("backup_seed_failed", String.format("Failed to back up seed (%s).", Utils.HEX.encode(res.getStatus())));
         }
 
-        return res.isValid() ? "valid" : "invalid";
+        return Utils.HEX.encode(res.getSeed());
+    }
+
+    public String signHash(int keyIndex, int symbolId, byte[] data) throws VCChipException {
+        SignHash command = SignHash.of(keyIndex, data);
+        PublicKey publicKey = getPublicKeyByIndexAndSymbolId(keyIndex, symbolId);
+        ECKey.ECDSASignature signature = null;
+        BigInteger r = null;
+        BigInteger s = null;
+
+        while (true) {
+            byte[] ret = channel.sendCommand(command);
+            Response res = new Response(ret);
+
+            if (!res.isSuccessful()) {
+                throw new VCChipException("sign_hash_failed", String.format("Fail to sign hash (%s).", Utils.HEX.encode(res.getStatus())));
+            }
+            byte[] rawSignature = res.getContent();
+            r = new BigInteger(1, Arrays.copyOfRange(rawSignature, 0, 32));
+            s = new BigInteger(1, Arrays.copyOfRange(rawSignature, 32, rawSignature.length));
+
+            signature = new ECKey.ECDSASignature(r, s);
+
+            if (r.toByteArray().length == 32 && s.toByteArray().length == 32 && signature.isCanonical()) {
+                break;
+            }
+        }
+
+        int recId = Card.getRecId(signature, data, publicKey);
+
+        return new Signature(r, s, recId + 4 + 27).toString();
+    }
+
+    public static int getRecId(ECKey.ECDSASignature signature, byte[] hash, PublicKey publicKey) {
+        Sha256Hash dataHash = Sha256Hash.wrap(hash);
+
+        String refPubKey = publicKey.getEncoded(true);
+
+        int recId = -1;
+        for (int i = 0; i < 4; i++) {
+            ECKey k = ECKey.recoverFromSignature(i, signature, dataHash, true);
+            try {
+                if (k != null && Utils.HEX.encode(k.getPubKey()).equals(refPubKey)) {
+                    return i;
+                }
+            } catch (Exception ex) {
+                // no need to handle anything here
+            }
+        }
+
+        return recId;
+    }
+
+
+    // TODO
+    public List<Signature> signTransaction(Transaction trx, int keyIndex) {
+        return new ArrayList<>();
+    }
+
+    // TODO
+    public List<Signature> signTransaction(byte[] signableDigest, int keyIndex) {
+        return new ArrayList<>();
+    }
+
+    public static Function<String, String> createSignProvider(int keyIndex) {
+        return (signHash) -> String.format("%s, %d", signHash, keyIndex);
     }
 }

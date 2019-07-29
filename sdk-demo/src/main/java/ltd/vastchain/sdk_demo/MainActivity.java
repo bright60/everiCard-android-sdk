@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button getIdentityIssuer;
     private Button creationEnd;
     private Button seedBackup;
+    private Button signHash;
     private TextView outputText;
     private Card card;
 
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         getIdentityIssuer = (Button) findViewById(R.id.getIdentityIssuer);
         creationEnd = (Button) findViewById(R.id.creationEnd);
         seedBackup = (Button) findViewById(R.id.seedBackup);
+        signHash = (Button) findViewById(R.id.signHash);
         outputText = (TextView) findViewById(R.id.outputText);
         outputText.setTextIsSelectable(true);
 
@@ -78,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         seedBackup.setOnClickListener(v -> {
             this.handleClick(this, "seed_backup");
         });
+        signHash.setOnClickListener(v -> {
+            this.handleClick(this, "sign_hash");
+        });
         modifyPin.setOnClickListener(v -> {
             this.handleClick(this, "modify_pin");
         });
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         try {
             if (card != null) {
                 if (command.equals("get_pubkey_0")) {
-                    this.outputText.setText(card.getPublicKeyByIndex(0).toString());
+                    this.outputText.setText(card.getPublicKeyByIndexAndSymbolId(0, 207).toString());
                 } else if (command.equals("get_display_name")) {
                     this.outputText.setText(card.getDisplayName());
                 } else if (command.equals("set_display_name")) {
@@ -165,6 +170,32 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                             byte[] newPinHex = Utils.HEX.decode(pins[1]);
                             boolean success = card.modifyPin(oldPinHex, newPinHex);
                             outputText.setText(success ? "Success" : "Failed");
+                        }
+                    });
+                    inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = inputAlert.create();
+                    alertDialog.show();
+                } else if (command.equals("sign_hash")) {
+                    final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
+                    inputAlert.setTitle("Sign Hash");
+                    inputAlert.setMessage("Input the signing hash in hex");
+                    final EditText hash = new EditText(ctx);
+                    inputAlert.setView(hash);
+                    inputAlert.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String signingHash = hash.getText().toString();
+                            try {
+                                String signature = card.signHash(0, 207, Utils.hash(Utils.HEX.decode(signingHash)));
+                                outputText.setText(signature);
+                            } catch (VCChipException e) {
+                                // no need to do anything
+                            }
                         }
                     });
                     inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
