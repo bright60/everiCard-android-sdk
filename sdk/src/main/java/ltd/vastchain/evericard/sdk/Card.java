@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.everitoken.sdk.java.EvtLink;
 import io.everitoken.sdk.java.PublicKey;
 import io.everitoken.sdk.java.Signature;
 import io.everitoken.sdk.java.Utils;
@@ -34,6 +35,7 @@ import ltd.vastchain.evericard.sdk.response.IdentityProducerResponse;
 import ltd.vastchain.evericard.sdk.response.PreferenceProducerResponse;
 import ltd.vastchain.evericard.sdk.response.Response;
 import ltd.vastchain.evericard.sdk.response.SeedBackupResponse;
+import ltd.vastchain.evericard.sdk.response.SignResponse;
 
 public class Card {
     private EveriCardChannel channel;
@@ -177,8 +179,8 @@ public class Card {
         return Utils.HEX.encode(res.getSeed());
     }
 
-    public String signHash(int keyIndex, int symbolId, byte[] data) throws VCChipException {
-        SignHash command = SignHash.of(keyIndex, data);
+    public String signHash(byte[] hash, int keyIndex, int symbolId) throws VCChipException {
+        SignHash command = SignHash.of(keyIndex, hash);
         PublicKey publicKey = getPublicKeyByIndexAndSymbolId(keyIndex, symbolId);
         ECKey.ECDSASignature signature = null;
         BigInteger r = null;
@@ -187,12 +189,13 @@ public class Card {
         // TODO: design counter to stop infinite loop
         while (true) {
             byte[] ret = channel.sendCommand(command);
-            Response res = new Response(ret);
+            SignResponse res = new SignResponse(ret);
 
             if (!res.isSuccessful()) {
                 throw new VCChipException("sign_hash_failed", String.format("Fail to sign hash (%s).", Utils.HEX.encode(res.getStatus())));
             }
-            byte[] rawSignature = res.getContent();
+
+            byte[] rawSignature = res.getSignature();
             r = new BigInteger(1, Arrays.copyOfRange(rawSignature, 0, 32));
             s = new BigInteger(1, Arrays.copyOfRange(rawSignature, 32, rawSignature.length));
 
@@ -205,7 +208,7 @@ public class Card {
         }
 
         // TODO: handle recId can't be found
-        int recId = Card.getRecId(signature, data, publicKey);
+        int recId = Card.getRecId(signature, hash, publicKey);
 
         return new Signature(r, s, recId + 4 + 27).toString();
     }
@@ -216,7 +219,11 @@ public class Card {
     }
 
     // TODO
-    public List<Signature> signTransaction(byte[] signableDigest, int keyIndex) {
-        return new ArrayList<>();
+    public String SignEvtLink(String evtLink, int keyIndex, int symbolId) {
+        // parse EvtLink
+        byte[] decodedEvtlink = EvtLink.decode(evtLink);
+
+
+        return "";
     }
 }

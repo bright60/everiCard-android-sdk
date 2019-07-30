@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                         public void onClick(DialogInterface dialog, int which) {
                             String signingHash = hash.getText().toString();
                             try {
-                                String signature = card.signHash(0, 207, Utils.hash(Utils.HEX.decode(signingHash)));
+                                String signature = card.signHash(Utils.hash(Utils.HEX.decode(signingHash)), 0, 207);
                                 outputText.setText(signature);
                             } catch (VCChipException e) {
                                 // no need to do anything
