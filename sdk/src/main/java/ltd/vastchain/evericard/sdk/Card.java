@@ -3,10 +3,8 @@ package ltd.vastchain.evericard.sdk;
 import androidx.arch.core.util.Function;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.Sha256Hash;
 
-import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +25,7 @@ import ltd.vastchain.evericard.sdk.command.ModifyPin;
 import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.command.SeedBackup;
+import ltd.vastchain.evericard.sdk.command.SignEvtLink;
 import ltd.vastchain.evericard.sdk.command.SignHash;
 import ltd.vastchain.evericard.sdk.command.VerifyPin;
 import ltd.vastchain.evericard.sdk.response.ConfigurationResponse;
@@ -35,33 +34,12 @@ import ltd.vastchain.evericard.sdk.response.IdentityProducerResponse;
 import ltd.vastchain.evericard.sdk.response.PreferenceProducerResponse;
 import ltd.vastchain.evericard.sdk.response.Response;
 import ltd.vastchain.evericard.sdk.response.SeedBackupResponse;
-import ltd.vastchain.evericard.sdk.response.SignResponse;
 
 public class Card {
     private EveriCardChannel channel;
 
     public Card(EveriCardChannel channel) {
         this.channel = channel;
-    }
-
-    public static int getRecId(ECKey.ECDSASignature signature, byte[] hash, PublicKey publicKey) {
-        Sha256Hash dataHash = Sha256Hash.wrap(hash);
-
-        String refPubKey = publicKey.getEncoded(true);
-
-        int recId = -1;
-        for (int i = 0; i < 4; i++) {
-            ECKey k = ECKey.recoverFromSignature(i, signature, dataHash, true);
-            try {
-                if (k != null && Utils.HEX.encode(k.getPubKey()).equals(refPubKey)) {
-                    return i;
-                }
-            } catch (Exception ex) {
-                // no need to handle anything here
-            }
-        }
-
-        return recId;
     }
 
     public static Function<String, String> createSignProvider(int keyIndex) {
@@ -105,6 +83,35 @@ public class Card {
 
         if (!res.isSuccessful()) {
             throw new VCChipException("set_display_name_failed", String.format("Failed to set display name to %s (%s).", name, Utils.HEX.encode(res.getStatus())));
+        }
+    }
+
+    public void setSymbolData(int slotId, int symbolId, int precision, long maxAllowedAmount) throws VCChipException {
+        if (slotId < 0 || slotId > 2) {
+            throw new IllegalArgumentException("Slot Id can only within 0~2");
+        }
+        if (symbolId < 0) {
+            throw new IllegalArgumentException("Symbol Id must be 0 or a positive number.");
+        }
+
+        if (precision < 0 || precision > 18) {
+            throw new IllegalArgumentException("Precision can only within 0~18");
+        }
+
+        if (maxAllowedAmount < 0 && maxAllowedAmount != -1) {
+            throw new IllegalArgumentException("Max Allowed Amount is not valid.");
+        }
+        byte[] bytes = ByteBuffer.allocate(14).put((byte) slotId).putInt(symbolId).put((byte) precision).putLong(maxAllowedAmount).array();
+
+        ConfigurationWrite command = ConfigurationWrite.configureSettings(Arrays.asList(
+                ConfigurationWrite.createTLVSetting((byte) 0x0d, bytes)
+        ), true);
+
+        byte[] ret = channel.sendCommand(command);
+        Response res = Response.of(ret);
+
+        if (!res.isSuccessful()) {
+            throw new VCChipException("set_symbol_data_failed", String.format("Failed to set symbol data (%s).", Utils.HEX.encode(res.getStatus())));
         }
     }
 
@@ -179,38 +186,11 @@ public class Card {
         return Utils.HEX.encode(res.getSeed());
     }
 
-    public String signHash(byte[] hash, int keyIndex, int symbolId) throws VCChipException {
+    public Signature signHash(byte[] hash, int keyIndex, int symbolId) throws VCChipException {
         SignHash command = SignHash.of(keyIndex, hash);
         PublicKey publicKey = getPublicKeyByIndexAndSymbolId(keyIndex, symbolId);
-        ECKey.ECDSASignature signature = null;
-        BigInteger r = null;
-        BigInteger s = null;
-
-        // TODO: design counter to stop infinite loop
-        while (true) {
-            byte[] ret = channel.sendCommand(command);
-            SignResponse res = new SignResponse(ret);
-
-            if (!res.isSuccessful()) {
-                throw new VCChipException("sign_hash_failed", String.format("Fail to sign hash (%s).", Utils.HEX.encode(res.getStatus())));
-            }
-
-            byte[] rawSignature = res.getSignature();
-            r = new BigInteger(1, Arrays.copyOfRange(rawSignature, 0, 32));
-            s = new BigInteger(1, Arrays.copyOfRange(rawSignature, 32, rawSignature.length));
-
-            signature = new ECKey.ECDSASignature(r, s);
-
-            // loop until get both r and s have 32 bytes
-            if (r.toByteArray().length == 32 && s.toByteArray().length == 32 && signature.isCanonical()) {
-                break;
-            }
-        }
-
-        // TODO: handle recId can't be found
-        int recId = Card.getRecId(signature, hash, publicKey);
-
-        return new Signature(r, s, recId + 4 + 27).toString();
+        Signer signer = new Signer(channel);
+        return signer.sign(command, publicKey, true);
     }
 
     // TODO
@@ -218,12 +198,10 @@ public class Card {
         return new ArrayList<>();
     }
 
-    // TODO
-    public String SignEvtLink(String evtLink, int keyIndex, int symbolId) {
-        // parse EvtLink
-        byte[] decodedEvtlink = EvtLink.decode(evtLink);
-
-
-        return "";
+    public Signature signEvtLink(String evtLink, int keyIndex, int symbolId) throws VCChipException {
+        SignEvtLink command = SignEvtLink.of(keyIndex, EvtLink.decode(evtLink));
+        PublicKey publicKey = getPublicKeyByIndexAndSymbolId(keyIndex, symbolId);
+        Signer signer = new Signer(channel);
+        return signer.sign(command, publicKey, false);
     }
 }

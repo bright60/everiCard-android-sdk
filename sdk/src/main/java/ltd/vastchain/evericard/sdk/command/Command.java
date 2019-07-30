@@ -42,6 +42,10 @@ public class Command implements CommandInterface {
         this(cla, ins, p1, p2, null, null, le);
     }
 
+    public static byte flagConfigurationItem(byte b) {
+        return (byte) (0x80 | b);
+    }
+
     public byte[] getBytes() {
         byte[] result = new byte[]{cla, ins, p1, p2};
 
@@ -60,7 +64,11 @@ public class Command implements CommandInterface {
         return result;
     }
 
-    public static byte flagConfigurationItem(byte b) {
-        return (byte) (0x80 | b);
+    public byte[] getData() {
+        if (data == null) {
+            return new byte[]{};
+        }
+
+        return data;
     }
 }

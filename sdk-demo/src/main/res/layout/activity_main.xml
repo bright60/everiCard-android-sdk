@@ -91,6 +91,18 @@
                     android:layout_height="wrap_content"
                     android:text="sign hash" />
 
+                <Button
+                    android:id="@+id/signEvtLink"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="sign evtlink" />
+
+                <Button
+                    android:id="@+id/setSymbolData"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="set symbol data" />
+
             </LinearLayout>
         </ScrollView>
 

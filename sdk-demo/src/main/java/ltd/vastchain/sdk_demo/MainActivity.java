@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import io.everitoken.sdk.java.Signature;
 import io.everitoken.sdk.java.Utils;
 import ltd.vastchain.evericard.sdk.Card;
 import ltd.vastchain.evericard.sdk.CardManager;
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button creationEnd;
     private Button seedBackup;
     private Button signHash;
+    private Button signEvtLink;
+    private Button setSymbolData;
     private TextView outputText;
     private Card card;
 
@@ -49,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         creationEnd = (Button) findViewById(R.id.creationEnd);
         seedBackup = (Button) findViewById(R.id.seedBackup);
         signHash = (Button) findViewById(R.id.signHash);
+        signEvtLink = (Button) findViewById(R.id.signEvtLink);
+        setSymbolData = (Button) findViewById(R.id.setSymbolData);
         outputText = (TextView) findViewById(R.id.outputText);
         outputText.setTextIsSelectable(true);
 
@@ -61,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         });
         setDisplayName.setOnClickListener((v) -> {
             this.handleClick(this, "set_display_name");
+        });
+        setSymbolData.setOnClickListener((v) -> {
+            this.handleClick(this, "set_symbol_data");
         });
         verifyPin.setOnClickListener(v -> {
             this.handleClick(this, "verify_pin");
@@ -82,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         });
         signHash.setOnClickListener(v -> {
             this.handleClick(this, "sign_hash");
+        });
+        signEvtLink.setOnClickListener(v -> {
+            this.handleClick(this, "sign_evtlink");
         });
         modifyPin.setOnClickListener(v -> {
             this.handleClick(this, "modify_pin");
@@ -109,6 +120,34 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                             if (userInputValue.length() > 0) {
                                 try {
                                     card.setDisplayName(userInputValue);
+                                } catch (VCChipException ex) {
+                                    Toast.makeText(ctx, ex.toString(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    });
+                    inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = inputAlert.create();
+                    alertDialog.show();
+                } else if (command.equals("set_symbol_data")) {
+                    final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
+                    inputAlert.setTitle("Set Symbol data");
+                    inputAlert.setMessage("Slot Id/Symbol Id/Precision/Max Allowed");
+                    final EditText userInput = new EditText(ctx);
+                    inputAlert.setView(userInput);
+                    inputAlert.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String input = userInput.getText().toString();
+                            if (input.length() > 0) {
+                                try {
+                                    String[] parts = input.split(",");
+                                    card.setSymbolData(Integer.valueOf(parts[0]), Integer.valueOf(parts[1]), Integer.parseInt(parts[2]), Long.valueOf(parts[3]));
                                 } catch (VCChipException ex) {
                                     Toast.makeText(ctx, ex.toString(), Toast.LENGTH_LONG).show();
                                 }
@@ -180,6 +219,32 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     });
                     AlertDialog alertDialog = inputAlert.create();
                     alertDialog.show();
+                } else if (command.equals("sign_evtlink")) {
+                    final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
+                    inputAlert.setTitle("Sign EvtLink");
+                    inputAlert.setMessage("Input evtlink");
+                    final EditText hash = new EditText(ctx);
+                    inputAlert.setView(hash);
+                    inputAlert.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String evtlink = hash.getText().toString();
+                            try {
+                                Signature signature = card.signEvtLink(evtlink, 0, 207);
+                                outputText.setText(signature.toString());
+                            } catch (VCChipException e) {
+                                Toast.makeText(ctx, e.toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                    inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = inputAlert.create();
+                    alertDialog.show();
                 } else if (command.equals("sign_hash")) {
                     final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
                     inputAlert.setTitle("Sign Hash");
@@ -191,8 +256,8 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                         public void onClick(DialogInterface dialog, int which) {
                             String signingHash = hash.getText().toString();
                             try {
-                                String signature = card.signHash(Utils.hash(Utils.HEX.decode(signingHash)), 0, 207);
-                                outputText.setText(signature);
+                                Signature signature = card.signHash(Utils.hash(Utils.HEX.decode(signingHash)), 0, 207);
+                                outputText.setText(signature.toString());
                             } catch (VCChipException e) {
                                 // no need to do anything
                             }

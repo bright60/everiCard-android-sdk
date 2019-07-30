@@ -5,7 +5,7 @@ public class SignEvtLink extends Command {
     public static byte INS = (byte) 0x13;
 
     public SignEvtLink(int keyIndex, byte[] data) {
-        super(CLA, INS, (byte) 0x00, (byte) keyIndex, (byte) data.length, data);
+        super(CLA, INS, (byte) 0x80, (byte) keyIndex, (byte) data.length, data);
     }
 
     public static SignEvtLink of(int keyIndex, byte[] data) {
