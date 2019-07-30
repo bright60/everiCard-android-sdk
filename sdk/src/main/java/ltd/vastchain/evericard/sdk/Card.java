@@ -42,6 +42,30 @@ public class Card {
         this.channel = channel;
     }
 
+    public static int getRecId(ECKey.ECDSASignature signature, byte[] hash, PublicKey publicKey) {
+        Sha256Hash dataHash = Sha256Hash.wrap(hash);
+
+        String refPubKey = publicKey.getEncoded(true);
+
+        int recId = -1;
+        for (int i = 0; i < 4; i++) {
+            ECKey k = ECKey.recoverFromSignature(i, signature, dataHash, true);
+            try {
+                if (k != null && Utils.HEX.encode(k.getPubKey()).equals(refPubKey)) {
+                    return i;
+                }
+            } catch (Exception ex) {
+                // no need to handle anything here
+            }
+        }
+
+        return recId;
+    }
+
+    public static Function<String, String> createSignProvider(int keyIndex) {
+        return (signHash) -> String.format("%s, %d", signHash, keyIndex);
+    }
+
     public PublicKey getPublicKeyByIndexAndSymbolId(int keyIndex, int symbolId) throws VCChipException {
         PublicKeyRead publicKeyRead = PublicKeyRead.byIndexAndSymbolId(keyIndex, symbolId);
 
@@ -160,6 +184,7 @@ public class Card {
         BigInteger r = null;
         BigInteger s = null;
 
+        // TODO: design counter to stop infinite loop
         while (true) {
             byte[] ret = channel.sendCommand(command);
             Response res = new Response(ret);
@@ -173,36 +198,17 @@ public class Card {
 
             signature = new ECKey.ECDSASignature(r, s);
 
+            // loop until get both r and s have 32 bytes
             if (r.toByteArray().length == 32 && s.toByteArray().length == 32 && signature.isCanonical()) {
                 break;
             }
         }
 
+        // TODO: handle recId can't be found
         int recId = Card.getRecId(signature, data, publicKey);
 
         return new Signature(r, s, recId + 4 + 27).toString();
     }
-
-    public static int getRecId(ECKey.ECDSASignature signature, byte[] hash, PublicKey publicKey) {
-        Sha256Hash dataHash = Sha256Hash.wrap(hash);
-
-        String refPubKey = publicKey.getEncoded(true);
-
-        int recId = -1;
-        for (int i = 0; i < 4; i++) {
-            ECKey k = ECKey.recoverFromSignature(i, signature, dataHash, true);
-            try {
-                if (k != null && Utils.HEX.encode(k.getPubKey()).equals(refPubKey)) {
-                    return i;
-                }
-            } catch (Exception ex) {
-                // no need to handle anything here
-            }
-        }
-
-        return recId;
-    }
-
 
     // TODO
     public List<Signature> signTransaction(Transaction trx, int keyIndex) {
@@ -212,9 +218,5 @@ public class Card {
     // TODO
     public List<Signature> signTransaction(byte[] signableDigest, int keyIndex) {
         return new ArrayList<>();
-    }
-
-    public static Function<String, String> createSignProvider(int keyIndex) {
-        return (signHash) -> String.format("%s, %d", signHash, keyIndex);
     }
 }
