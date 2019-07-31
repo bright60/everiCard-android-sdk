@@ -101,6 +101,7 @@ public class Card {
         if (maxAllowedAmount < 0 && maxAllowedAmount != -1) {
             throw new IllegalArgumentException("Max Allowed Amount is not valid.");
         }
+
         byte[] bytes = ByteBuffer.allocate(14).put((byte) slotId).putInt(symbolId).put((byte) precision).putLong(maxAllowedAmount).array();
 
         ConfigurationWrite command = ConfigurationWrite.configureSettings(Arrays.asList(
@@ -115,7 +116,7 @@ public class Card {
         }
     }
 
-    public boolean verifyPin(String pinInHex) {
+    public boolean verifyPin(String pinInHex) throws VCChipException {
         VerifyPin command = VerifyPin.of(Utils.HEX.decode(pinInHex));
 
         byte[] ret = channel.sendCommand(command);
@@ -124,7 +125,7 @@ public class Card {
         return res.isSuccessful();
     }
 
-    public boolean modifyPin(byte[] oldPin, byte[] newPin) {
+    public boolean modifyPin(byte[] oldPin, byte[] newPin) throws VCChipException {
         ModifyPin command = ModifyPin.of(oldPin, newPin);
         byte[] ret = channel.sendCommand(command);
 
@@ -147,7 +148,7 @@ public class Card {
         return Utils.HEX.encode(res.getContent());
     }
 
-    public String getIdentityIssuer() {
+    public String getIdentityIssuer() throws VCChipException {
         byte[] random = Utils.random32Bytes();
         IdentityIssuerRead command = IdentityIssuerRead.of(random);
 
@@ -156,7 +157,7 @@ public class Card {
         return Utils.HEX.encode(res.getContent());
     }
 
-    public String getPreferenceProducer() {
+    public String getPreferenceProducer() throws VCChipException {
         PreferenceProducerRead command = new PreferenceProducerRead();
 
         byte[] ret = channel.sendCommand(command);

@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 import java.io.IOException;
 
+import ltd.vastchain.evericard.sdk.VCChipException;
 import ltd.vastchain.evericard.sdk.command.CommandInterface;
 
 public class AndroidNFCEveriCardChannel extends EveriCardChannel {
@@ -16,7 +17,7 @@ public class AndroidNFCEveriCardChannel extends EveriCardChannel {
     }
 
     @Override
-    public byte[] sendCommand(CommandInterface command) {
+    public byte[] sendCommand(CommandInterface command) throws VCChipException {
         Tag tag = (Tag) p;
         final IsoDep isoDep = IsoDep.get(tag);
         byte[] ret = new byte[]{};
@@ -26,7 +27,7 @@ public class AndroidNFCEveriCardChannel extends EveriCardChannel {
                 ret = isoDep.transceive(command.getBytes());
                 isoDep.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new VCChipException("card_io_exception", "Unable to send command to everiCard.");
             }
         }
 

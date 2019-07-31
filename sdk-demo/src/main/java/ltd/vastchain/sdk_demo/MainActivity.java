@@ -172,8 +172,12 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String userInputValue = userInput.getText().toString();
-                            boolean success = card.verifyPin(userInputValue);
-                            outputText.setText(success ? "Verified" : "Invalid");
+                            try {
+                                boolean success = card.verifyPin(userInputValue);
+                                outputText.setText(success ? "Verified" : "Invalid");
+                            } catch (VCChipException ex) {
+                                Toast.makeText(ctx, ex.toString(), Toast.LENGTH_LONG).show();
+                            }
                         }
                     });
                     inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -207,8 +211,12 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                             String[] pins = pinText.split(",");
                             byte[] oldPinHex = Utils.HEX.decode(pins[0]);
                             byte[] newPinHex = Utils.HEX.decode(pins[1]);
-                            boolean success = card.modifyPin(oldPinHex, newPinHex);
-                            outputText.setText(success ? "Success" : "Failed");
+                            try {
+                                boolean success = card.modifyPin(oldPinHex, newPinHex);
+                                outputText.setText(success ? "Success" : "Failed");
+                            } catch (VCChipException ex) {
+                                Toast.makeText(ctx, ex.toString(), Toast.LENGTH_LONG).show();
+                            }
                         }
                     });
                     inputAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -259,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                                 Signature signature = card.signHash(Utils.hash(Utils.HEX.decode(signingHash)), 0, 207);
                                 outputText.setText(signature.toString());
                             } catch (VCChipException e) {
-                                // no need to do anything
+                                Toast.makeText(ctx, e.toString(), Toast.LENGTH_LONG).show();
                             }
                         }
                     });

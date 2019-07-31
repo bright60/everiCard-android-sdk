@@ -55,7 +55,6 @@ public class Signer {
         BigInteger r = null;
         BigInteger s = null;
 
-        System.out.println(Utils.HEX.encode(cardCommand.getBytes()));
         while (true) {
             byte[] ret = channel.sendCommand(cardCommand);
             SignResponse res = new SignResponse(ret);
