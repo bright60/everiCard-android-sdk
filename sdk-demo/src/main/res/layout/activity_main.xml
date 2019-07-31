@@ -103,6 +103,12 @@
                     android:layout_height="wrap_content"
                     android:text="set symbol data" />
 
+                <Button
+                    android:id="@+id/transferFt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="transferft" />
+
             </LinearLayout>
         </ScrollView>
 

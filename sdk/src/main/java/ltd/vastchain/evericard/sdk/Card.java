@@ -1,7 +1,5 @@
 package ltd.vastchain.evericard.sdk;
 
-import androidx.arch.core.util.Function;
-
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.nio.ByteBuffer;
@@ -40,10 +38,6 @@ public class Card {
 
     public Card(EveriCardChannel channel) {
         this.channel = channel;
-    }
-
-    public static Function<String, String> createSignProvider(int keyIndex) {
-        return (signHash) -> String.format("%s, %d", signHash, keyIndex);
     }
 
     public PublicKey getPublicKeyByIndexAndSymbolId(int keyIndex, int symbolId) throws VCChipException {
@@ -190,6 +184,7 @@ public class Card {
     public Signature signHash(byte[] hash, int keyIndex, int symbolId) throws VCChipException {
         SignHash command = SignHash.of(keyIndex, hash);
         PublicKey publicKey = getPublicKeyByIndexAndSymbolId(keyIndex, symbolId);
+        System.out.println(publicKey.toString());
         Signer signer = new Signer(channel);
         return signer.sign(command, publicKey, true);
     }

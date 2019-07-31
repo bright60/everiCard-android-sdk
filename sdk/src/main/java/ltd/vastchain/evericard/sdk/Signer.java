@@ -78,6 +78,6 @@ public class Signer {
         // TODO: handle recId can't be found
         int recId = getRecId(signature, asHash ? cardCommand.getData() : Utils.hash(cardCommand.getData()), publicKey);
 
-        return new Signature(r, s, recId + 4 + 27);
+        return new Signature(r, s, recId);
     }
 }

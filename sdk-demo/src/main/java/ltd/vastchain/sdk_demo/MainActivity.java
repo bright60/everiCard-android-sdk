@@ -12,8 +12,21 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Arrays;
+
+import io.everitoken.sdk.java.Api;
+import io.everitoken.sdk.java.PublicKey;
 import io.everitoken.sdk.java.Signature;
 import io.everitoken.sdk.java.Utils;
+import io.everitoken.sdk.java.abi.TransferFungibleAction;
+import io.everitoken.sdk.java.dto.NodeInfo;
+import io.everitoken.sdk.java.dto.Transaction;
+import io.everitoken.sdk.java.dto.TransactionData;
+import io.everitoken.sdk.java.dto.TransactionDigest;
+import io.everitoken.sdk.java.exceptions.ApiResponseException;
+import io.everitoken.sdk.java.param.TestNetNetParams;
+import io.everitoken.sdk.java.service.TransactionConfiguration;
+import io.everitoken.sdk.java.service.TransactionService;
 import ltd.vastchain.evericard.sdk.Card;
 import ltd.vastchain.evericard.sdk.CardManager;
 import ltd.vastchain.evericard.sdk.VCChipException;
@@ -33,8 +46,10 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button signHash;
     private Button signEvtLink;
     private Button setSymbolData;
+    private Button transferFt;
     private TextView outputText;
     private Card card;
+    private String log = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         signHash = (Button) findViewById(R.id.signHash);
         signEvtLink = (Button) findViewById(R.id.signEvtLink);
         setSymbolData = (Button) findViewById(R.id.setSymbolData);
+        transferFt = (Button) findViewById(R.id.transferFt);
         outputText = (TextView) findViewById(R.id.outputText);
         outputText.setTextIsSelectable(true);
 
@@ -96,6 +112,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         });
         modifyPin.setOnClickListener(v -> {
             this.handleClick(this, "modify_pin");
+        });
+        transferFt.setOnClickListener(v -> {
+            this.handleClick(this, "transferft");
         });
 
         cardManager.setOnCardSwipeListener(this);
@@ -279,6 +298,11 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     });
                     AlertDialog alertDialog = inputAlert.create();
                     alertDialog.show();
+                } else if (command.equals("transferft")) {
+                    new Thread(() -> {
+                        outputText.setText("started");
+                        transferFungibleToken();
+                    }).start();
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();
                 }
@@ -288,6 +312,58 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         } catch (VCChipException e) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void transferFungibleToken() {
+        TestNetNetParams netParams = new TestNetNetParams();
+
+        try {
+            NodeInfo nodeInfo = new Api(netParams).getInfo();
+
+            writeLog("created nodeInfo");
+            TransferFungibleAction transferFungibleAction = TransferFungibleAction.of("1.00000 S#207",
+                    "EVT5EQiiyU9RoZkQUMnoAqqT86wHuDW5T37QqFDuCMPpPXVY3sw2e",
+                    "EVT6Qz3wuRjyN6gaU3P3XRxpnEZnM4oPxortemaWDwFRvsv2FxgND", "test offline sign");
+
+            writeLog("created transferFungibleAction");
+            // Init transaction service with net parameters
+            TransactionService transactionService = TransactionService.of(netParams);
+
+            // Construct transaction configuration
+            TransactionConfiguration trxConfig = TransactionConfiguration.of(nodeInfo, 1000000,
+                    PublicKey.of("EVT5EQiiyU9RoZkQUMnoAqqT86wHuDW5T37QqFDuCMPpPXVY3sw2e"), false, null);
+            writeLog("created trxConfig");
+
+            // Construct raw transaction
+            Transaction rawTrx = transactionService.buildRawTransaction(trxConfig, Arrays.asList(transferFungibleAction),
+                    true);
+            writeLog("built rawTrx");
+
+            // get signatures from offline wallet rpc
+            TransactionDigest trxDigest = TransactionService.getTransactionSignableDigest(netParams, rawTrx);
+            writeLog(String.format("getting hash: %s", Utils.HEX.encode(trxDigest.getDigest())));
+            Signature signature = card.signHash(trxDigest.getDigest(), 0, 207);
+            writeLog(signature.toString());
+
+            // Push the raw transaction together with the signature to chain
+            TransactionData push = transactionService.push(rawTrx, Arrays.asList(signature.toString()));
+
+            writeLog(push.getTrxId());
+        } catch (ApiResponseException ex) {
+            writeLog(ex.getRaw().toJSONString());
+        } catch (VCChipException ex) {
+            writeLog(ex.toString());
+        }
+
+    }
+
+    private void writeLog(String message) {
+        if (log.length() == 0) {
+            log = message;
+        } else {
+            log = String.format("%s\n%s", log, message);
+        }
+        outputText.setText(log);
     }
 
     @Override
