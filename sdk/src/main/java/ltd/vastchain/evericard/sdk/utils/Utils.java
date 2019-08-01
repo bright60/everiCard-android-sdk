@@ -1,13 +1,27 @@
 package ltd.vastchain.evericard.sdk.utils;
 
-import org.spongycastle.crypto.digests.SHA1Digest;
+import com.google.common.io.BaseEncoding;
+
+import org.bitcoinj.core.Sha256Hash;
+
+import java.security.SecureRandom;
 
 public class Utils {
-    public static byte[] sha1(byte[] inputs) {
-        SHA1Digest digest = new SHA1Digest();
-        digest.update(inputs, 0, inputs.length);
-        byte[] ret = new byte[]{};
-        digest.doFinal(ret, 20);
-        return ret;
+    public static final BaseEncoding HEX = BaseEncoding.base16().lowerCase();
+
+    public static String random32BytesAsHex() {
+        byte[] randomBytes = random32Bytes();
+        return HEX.encode(randomBytes);
+    }
+
+    public static byte[] hash(byte[] data) {
+        return Sha256Hash.hash(data);
+    }
+
+    public static byte[] random32Bytes() {
+        SecureRandom random = new SecureRandom();
+        byte[] values = new byte[32];
+        random.nextBytes(values);
+        return values;
     }
 }

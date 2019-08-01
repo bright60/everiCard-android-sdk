@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-import io.everitoken.sdk.java.Utils;
+import ltd.vastchain.evericard.sdk.utils.Utils;
+
 
 class SeedBackupResponseTest {
 

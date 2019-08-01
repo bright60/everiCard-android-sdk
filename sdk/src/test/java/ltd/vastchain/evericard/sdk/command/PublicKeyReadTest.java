@@ -3,7 +3,8 @@ package ltd.vastchain.evericard.sdk.command;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.everitoken.sdk.java.Utils;
+import ltd.vastchain.evericard.sdk.utils.Utils;
+
 
 class PublicKeyReadTest {
 

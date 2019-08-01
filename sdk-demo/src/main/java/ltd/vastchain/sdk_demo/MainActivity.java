@@ -17,7 +17,6 @@ import java.util.Arrays;
 import io.everitoken.sdk.java.Api;
 import io.everitoken.sdk.java.PublicKey;
 import io.everitoken.sdk.java.Signature;
-import io.everitoken.sdk.java.Utils;
 import io.everitoken.sdk.java.abi.TransferFungibleAction;
 import io.everitoken.sdk.java.dto.NodeInfo;
 import io.everitoken.sdk.java.dto.Transaction;
@@ -30,6 +29,7 @@ import io.everitoken.sdk.java.service.TransactionService;
 import ltd.vastchain.evericard.sdk.Card;
 import ltd.vastchain.evericard.sdk.CardManager;
 import ltd.vastchain.evericard.sdk.VCChipException;
+import ltd.vastchain.evericard.sdk.utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements CardManager.OnCardSwipeListener {
     private CardManager cardManager;

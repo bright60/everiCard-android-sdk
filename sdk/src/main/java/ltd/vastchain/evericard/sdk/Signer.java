@@ -9,10 +9,10 @@ import java.util.Arrays;
 
 import io.everitoken.sdk.java.PublicKey;
 import io.everitoken.sdk.java.Signature;
-import io.everitoken.sdk.java.Utils;
 import ltd.vastchain.evericard.sdk.channels.EveriCardChannel;
 import ltd.vastchain.evericard.sdk.command.CommandInterface;
 import ltd.vastchain.evericard.sdk.response.SignResponse;
+import ltd.vastchain.evericard.sdk.utils.Utils;
 
 public class Signer {
     private final EveriCardChannel channel;
