@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                 } else if (command.equals("set_symbol_data")) {
                     final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
                     inputAlert.setTitle("Set Symbol data");
-                    inputAlert.setMessage("Slot Id/Symbol Id/Precision/Max Allowed");
+                    inputAlert.setMessage("Format: Slot Id,Symbol Id,Precision,Max Allowed");
                     final EditText userInput = new EditText(ctx);
                     inputAlert.setView(userInput);
                     inputAlert.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
@@ -316,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
 
     private void transferFungibleToken() {
         TestNetNetParams netParams = new TestNetNetParams();
+        outputText.setText("");
 
         try {
             NodeInfo nodeInfo = new Api(netParams).getInfo();
@@ -342,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
             // get signatures from offline wallet rpc
             TransactionDigest trxDigest = TransactionService.getTransactionSignableDigest(netParams, rawTrx);
             writeLog(String.format("getting hash: %s", Utils.HEX.encode(trxDigest.getDigest())));
+
             Signature signature = card.signHash(trxDigest.getDigest(), 0, 207);
             writeLog(signature.toString());
 
