@@ -63,8 +63,7 @@ public class Card {
             throw new VCChipException("get_display_name_failed", "Failed to get display name");
         }
 
-        String utf = new String(res.getConfigurationData(), StandardCharsets.UTF_8);
-        return StringEscapeUtils.unescapeXml(utf);
+        return new String(res.getConfigurationData(), StandardCharsets.UTF_8);
     }
 
     public void setDisplayName(String name) throws VCChipException {
