@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import java.util.Arrays;
 
 import io.everitoken.sdk.java.Api;
@@ -126,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                 if (command.equals("get_pubkey_0")) {
                     this.outputText.setText(card.getPublicKeyByIndexAndSymbolId(0, 207).toString());
                 } else if (command.equals("get_display_name")) {
-                    this.outputText.setText(card.getDisplayName());
+                    this.outputText.setText(StringEscapeUtils.unescapeXml(card.getDisplayName()));
                 } else if (command.equals("set_display_name")) {
                     final AlertDialog.Builder inputAlert = new AlertDialog.Builder(ctx);
                     inputAlert.setTitle("Set Display Name");
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                             String userInputValue = userInput.getText().toString();
                             if (userInputValue.length() > 0) {
                                 try {
-                                    card.setDisplayName(userInputValue);
+                                    card.setDisplayName(StringEscapeUtils.escapeXml(userInputValue));
                                 } catch (VCChipException ex) {
                                     Toast.makeText(ctx, ex.toString(), Toast.LENGTH_LONG).show();
                                 }

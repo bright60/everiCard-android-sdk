@@ -1,7 +1,5 @@
 package ltd.vastchain.evericard.sdk;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -68,7 +66,7 @@ public class Card {
 
     public void setDisplayName(String name) throws VCChipException {
         ConfigurationWrite command = ConfigurationWrite.configureSettings(Arrays.asList(
-                ConfigurationWrite.createTLVSetting((byte) 0x0a, StringEscapeUtils.escapeXml(name).getBytes())
+                ConfigurationWrite.createTLVSetting((byte) 0x0a, name.getBytes())
         ), true);
 
         byte[] ret = channel.sendCommand(command);
