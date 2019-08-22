@@ -1,6 +1,7 @@
 package ltd.vastchain.evericard.sdk.response;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
+
 
 public class PreferenceProducerResponse extends Response {
 
