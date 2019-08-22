@@ -19,6 +19,7 @@ import ltd.vastchain.evericard.sdk.command.IdentityIssuerRead;
 import ltd.vastchain.evericard.sdk.command.IdentityProducerRead;
 import ltd.vastchain.evericard.sdk.command.ModifyPin;
 import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
+import ltd.vastchain.evericard.sdk.command.PrivateKeyFileCreate;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.command.SeedBackup;
 import ltd.vastchain.evericard.sdk.command.SignEvtLink;
@@ -36,6 +37,17 @@ public class Card {
 
     public Card(EveriCardChannel channel) {
         this.channel = channel;
+    }
+
+    public void createKeyWithIndexAndSymboId(int index, int symbolId, boolean pinProtected) throws VCChipException {
+        PrivateKeyFileCreate command = PrivateKeyFileCreate.setByIndexAndSymbolId(index, symbolId, pinProtected);
+
+        byte[] ret = channel.sendCommand(command);
+        Response res = Response.of(ret);
+
+        if (!res.isSuccessful()) {
+            throw new VCChipException("create_key_with_index_symbolId", String.format("Failed to create key for symbol %d at index %d", symbolId, index));
+        }
     }
 
     public PublicKey getPublicKeyByIndexAndSymbolId(int keyIndex, int symbolId) throws VCChipException {

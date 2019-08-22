@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button signEvtLink;
     private Button setSymbolData;
     private Button transferFt;
+    private Button createKeyByIndexAndSymbolId;
     private TextView outputText;
     private Card card;
     private String log = "";
@@ -58,21 +59,22 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        getPubKey0 = (Button) findViewById(R.id.getPubKey0);
-        getDisplayName = (Button) findViewById(R.id.getDisplayName);
-        setDisplayName = (Button) findViewById(R.id.setDisplayName);
-        verifyPin = (Button) findViewById(R.id.verifyPin);
-        modifyPin = (Button) findViewById(R.id.modifyPin);
-        getIdentityProducer = (Button) findViewById(R.id.getIdentityProducer);
-        getPrefProducer = (Button) findViewById(R.id.getPrefProducer);
-        getIdentityIssuer = (Button) findViewById(R.id.getIdentityIssuer);
-        creationEnd = (Button) findViewById(R.id.creationEnd);
-        seedBackup = (Button) findViewById(R.id.seedBackup);
-        signHash = (Button) findViewById(R.id.signHash);
-        signEvtLink = (Button) findViewById(R.id.signEvtLink);
-        setSymbolData = (Button) findViewById(R.id.setSymbolData);
-        transferFt = (Button) findViewById(R.id.transferFt);
-        outputText = (TextView) findViewById(R.id.outputText);
+        getPubKey0 = findViewById(R.id.getPubKey0);
+        getDisplayName = findViewById(R.id.getDisplayName);
+        setDisplayName = findViewById(R.id.setDisplayName);
+        verifyPin = findViewById(R.id.verifyPin);
+        modifyPin = findViewById(R.id.modifyPin);
+        getIdentityProducer = findViewById(R.id.getIdentityProducer);
+        getPrefProducer = findViewById(R.id.getPrefProducer);
+        getIdentityIssuer = findViewById(R.id.getIdentityIssuer);
+        creationEnd = findViewById(R.id.creationEnd);
+        seedBackup = findViewById(R.id.seedBackup);
+        signHash = findViewById(R.id.signHash);
+        signEvtLink = findViewById(R.id.signEvtLink);
+        setSymbolData = findViewById(R.id.setSymbolData);
+        transferFt = findViewById(R.id.transferFt);
+        outputText = findViewById(R.id.outputText);
+        createKeyByIndexAndSymbolId = findViewById(R.id.keyCreateByIndexAndSymbolId);
         outputText.setTextIsSelectable(true);
 
         this.cardManager = new CardManager(this);
@@ -118,6 +120,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         transferFt.setOnClickListener(v -> {
             this.handleClick(this, "transferft");
         });
+        createKeyByIndexAndSymbolId.setOnClickListener(v -> {
+            this.handleClick(this, "create_key_by_index_symbolId");
+        });
 
         cardManager.setOnCardSwipeListener(this);
     }
@@ -126,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         try {
             if (card != null) {
                 if (command.equals("get_pubkey_0")) {
-                    this.outputText.setText(card.getPublicKeyByIndexAndSymbolId(0, 207).toString());
+                    this.outputText.setText(card.getPublicKeyByIndexAndSymbolId(20, 11575).toString());
                 } else if (command.equals("get_display_name")) {
                     this.outputText.setText(StringEscapeUtils.unescapeXml(card.getDisplayName()));
                 } else if (command.equals("set_display_name")) {
@@ -305,6 +310,9 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                         outputText.setText("started");
                         transferFungibleToken();
                     }).start();
+                } else if (command.equals("create_key_by_index_symbolId")) {
+                    card.createKeyWithIndexAndSymboId(20, 11575, false);
+                    outputText.setText("Created key with index and symbolId");
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();
                 }

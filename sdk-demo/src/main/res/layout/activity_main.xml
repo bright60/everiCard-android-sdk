@@ -109,6 +109,12 @@
                     android:layout_height="wrap_content"
                     android:text="transferft" />
 
+                <Button
+                    android:id="@+id/keyCreateByIndexAndSymbolId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create Key by Index and SymolId" />
+
             </LinearLayout>
         </ScrollView>
 
