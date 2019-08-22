@@ -19,6 +19,7 @@ import ltd.vastchain.evericard.sdk.command.IdentityIssuerRead;
 import ltd.vastchain.evericard.sdk.command.IdentityProducerRead;
 import ltd.vastchain.evericard.sdk.command.ModifyPin;
 import ltd.vastchain.evericard.sdk.command.PreferenceProducerRead;
+import ltd.vastchain.evericard.sdk.command.PrivateKeyFileConfigure;
 import ltd.vastchain.evericard.sdk.command.PrivateKeyFileCreate;
 import ltd.vastchain.evericard.sdk.command.PublicKeyRead;
 import ltd.vastchain.evericard.sdk.command.SeedBackup;
@@ -39,7 +40,7 @@ public class Card {
         this.channel = channel;
     }
 
-    public void createKeyWithIndexAndSymboId(int index, int symbolId, boolean pinProtected) throws VCChipException {
+    public void createKeyWithIndexAndSymbolId(int index, int symbolId, boolean pinProtected) throws VCChipException {
         PrivateKeyFileCreate command = PrivateKeyFileCreate.setByIndexAndSymbolId(index, symbolId, pinProtected);
 
         byte[] ret = channel.sendCommand(command);
@@ -47,6 +48,17 @@ public class Card {
 
         if (!res.isSuccessful()) {
             throw new VCChipException("create_key_with_index_symbolId", String.format("Failed to create key for symbol %d at index %d", symbolId, index));
+        }
+    }
+
+    public void confitureKeyWithIndex(int index) throws VCChipException {
+        PrivateKeyFileConfigure command = PrivateKeyFileConfigure.generateInternalKey(index);
+
+        byte[] ret = channel.sendCommand(command);
+        Response res = Response.of(ret);
+
+        if (!res.isSuccessful()) {
+            throw new VCChipException("configure_key_with_index", String.format("Failed to set key for index %d", index));
         }
     }
 

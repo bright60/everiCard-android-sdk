@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button setSymbolData;
     private Button transferFt;
     private Button createKeyByIndexAndSymbolId;
+    private Button configureKeyByIndex;
     private TextView outputText;
     private Card card;
     private String log = "";
@@ -75,63 +76,37 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         transferFt = findViewById(R.id.transferFt);
         outputText = findViewById(R.id.outputText);
         createKeyByIndexAndSymbolId = findViewById(R.id.keyCreateByIndexAndSymbolId);
+        configureKeyByIndex = findViewById(R.id.keyConfigureByIndex);
         outputText.setTextIsSelectable(true);
 
         this.cardManager = new CardManager(this);
-        getPubKey0.setOnClickListener((v) -> {
-            this.handleClick(this, "get_pubkey_0");
-        });
-        getDisplayName.setOnClickListener((v) -> {
-            this.handleClick(this, "get_display_name");
-        });
-        setDisplayName.setOnClickListener((v) -> {
-            this.handleClick(this, "set_display_name");
-        });
-        setSymbolData.setOnClickListener((v) -> {
-            this.handleClick(this, "set_symbol_data");
-        });
-        verifyPin.setOnClickListener(v -> {
-            this.handleClick(this, "verify_pin");
-        });
-        getIdentityProducer.setOnClickListener(v -> {
-            this.handleClick(this, "get_identity_producer");
-        });
-        getPrefProducer.setOnClickListener(v -> {
-            this.handleClick(this, "get_pref_producer");
-        });
-        getIdentityIssuer.setOnClickListener(v -> {
-            this.handleClick(this, "get_identity_issuer");
-        });
-        creationEnd.setOnClickListener(v -> {
-            this.handleClick(this, "creation_end");
-        });
-        seedBackup.setOnClickListener(v -> {
-            this.handleClick(this, "seed_backup");
-        });
-        signHash.setOnClickListener(v -> {
-            this.handleClick(this, "sign_hash");
-        });
-        signEvtLink.setOnClickListener(v -> {
-            this.handleClick(this, "sign_evtlink");
-        });
-        modifyPin.setOnClickListener(v -> {
-            this.handleClick(this, "modify_pin");
-        });
-        transferFt.setOnClickListener(v -> {
-            this.handleClick(this, "transferft");
-        });
-        createKeyByIndexAndSymbolId.setOnClickListener(v -> {
-            this.handleClick(this, "create_key_by_index_symbolId");
-        });
+        getPubKey0.setOnClickListener((v) -> this.handleClick(this, "get_pubkey_0"));
+        getDisplayName.setOnClickListener((v) -> this.handleClick(this, "get_display_name"));
+        setDisplayName.setOnClickListener((v) -> this.handleClick(this, "set_display_name"));
+        setSymbolData.setOnClickListener((v) -> this.handleClick(this, "set_symbol_data"));
+        verifyPin.setOnClickListener(v -> this.handleClick(this, "verify_pin"));
+        getIdentityProducer.setOnClickListener(v -> this.handleClick(this, "get_identity_producer"));
+        getPrefProducer.setOnClickListener(v -> this.handleClick(this, "get_pref_producer"));
+        getIdentityIssuer.setOnClickListener(v -> this.handleClick(this, "get_identity_issuer"));
+        creationEnd.setOnClickListener(v -> this.handleClick(this, "creation_end"));
+        seedBackup.setOnClickListener(v -> this.handleClick(this, "seed_backup"));
+        signHash.setOnClickListener(v -> this.handleClick(this, "sign_hash"));
+        signEvtLink.setOnClickListener(v -> this.handleClick(this, "sign_evtlink"));
+        modifyPin.setOnClickListener(v -> this.handleClick(this, "modify_pin"));
+        transferFt.setOnClickListener(v -> this.handleClick(this, "transferft"));
+        createKeyByIndexAndSymbolId.setOnClickListener(v -> this.handleClick(this, "create_key_by_index_symbolId"));
+        configureKeyByIndex.setOnClickListener(v -> this.handleClick(this, "configure_key_by_index"));
 
         cardManager.setOnCardSwipeListener(this);
     }
 
     private void handleClick(Context ctx, String command) {
+        int index = 100;
+        int symbolId = 11575;
         try {
             if (card != null) {
                 if (command.equals("get_pubkey_0")) {
-                    this.outputText.setText(card.getPublicKeyByIndexAndSymbolId(20, 11575).toString());
+                    this.outputText.setText(card.getPublicKeyByIndexAndSymbolId(index, symbolId).toString());
                 } else if (command.equals("get_display_name")) {
                     this.outputText.setText(StringEscapeUtils.unescapeXml(card.getDisplayName()));
                 } else if (command.equals("set_display_name")) {
@@ -311,8 +286,11 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                         transferFungibleToken();
                     }).start();
                 } else if (command.equals("create_key_by_index_symbolId")) {
-                    card.createKeyWithIndexAndSymboId(20, 11575, false);
+                    card.createKeyWithIndexAndSymbolId(index, symbolId, false);
                     outputText.setText("Created key with index and symbolId");
+                } else if (command.equals("configure_key_by_index")) {
+                    card.confitureKeyWithIndex(index);
+                    outputText.setText(String.format("Set key with index %d", index));
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();
                 }

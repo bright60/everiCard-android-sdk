@@ -115,6 +115,12 @@
                     android:layout_height="wrap_content"
                     android:text="Create Key by Index and SymolId" />
 
+                <Button
+                    android:id="@+id/keyConfigureByIndex"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Configure Key by Index" />
+
             </LinearLayout>
         </ScrollView>
 
