@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -125,4 +128,30 @@
         </ScrollView>
 
     </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/settingBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="66dp"
+            android:clickable="true"
+            android:textDirection="ltr"
+            app:backgroundTint="#EB6565"
+            app:layout_anchor="@+id/linearLayout"
+            app:layout_anchorGravity="end|bottom"
+            app:rippleColor="#B98989" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:elevation="16dp"
+            android:text="S"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/white" />
+    </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

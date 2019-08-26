@@ -3,6 +3,7 @@ package ltd.vastchain.sdk_demo;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,10 +12,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import io.everitoken.sdk.java.Api;
 import io.everitoken.sdk.java.PublicKey;
@@ -51,9 +56,11 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     private Button transferFt;
     private Button createKeyByIndexAndSymbolId;
     private Button configureKeyByIndex;
+    private FloatingActionButton settingBtn;
     private TextView outputText;
     private Card card;
     private String log = "";
+    private Map<String, ?> pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +84,19 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         outputText = findViewById(R.id.outputText);
         createKeyByIndexAndSymbolId = findViewById(R.id.keyCreateByIndexAndSymbolId);
         configureKeyByIndex = findViewById(R.id.keyConfigureByIndex);
+        settingBtn = findViewById(R.id.settingBtn);
+
         outputText.setTextIsSelectable(true);
 
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(this);
+        pref = shared.getAll();
+
         this.cardManager = new CardManager(this);
+
+        settingBtn.setOnClickListener(view -> {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        });
         getPubKey0.setOnClickListener((v) -> this.handleClick(this, "get_pubkey_0"));
         getDisplayName.setOnClickListener((v) -> this.handleClick(this, "get_display_name"));
         setDisplayName.setOnClickListener((v) -> this.handleClick(this, "set_display_name"));
@@ -101,8 +118,20 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
     }
 
     private void handleClick(Context ctx, String command) {
-        int index = 100;
-        int symbolId = 11575;
+
+        int index = 0;
+        int symbolId = 1;
+
+        String keyIndex = (String) pref.get("keyIndex");
+        String symbolIdFromSetting = (String) pref.get("symbolId");
+        if (keyIndex != null) {
+            index = Integer.valueOf(keyIndex);
+        }
+
+        if (symbolIdFromSetting != null) {
+            symbolId = Integer.valueOf(symbolIdFromSetting);
+        }
+
         try {
             if (card != null) {
                 if (command.equals("get_pubkey_0")) {
@@ -287,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     }).start();
                 } else if (command.equals("create_key_by_index_symbolId")) {
                     card.createKeyWithIndexAndSymbolId(index, symbolId, false);
-                    outputText.setText("Created key with index and symbolId");
+                    outputText.setText(String.format("Created key with index (%s) and symbolId (%s)", index, symbolId));
                 } else if (command.equals("configure_key_by_index")) {
                     card.confitureKeyWithIndex(index);
                     outputText.setText(String.format("Set key with index %d", index));

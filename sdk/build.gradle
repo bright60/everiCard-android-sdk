@@ -1,6 +1,14 @@
 apply plugin: 'com.android.library'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/Users/feiliu/Projects/vastchain/everiCard-android-sdk/vctc-release.keystore')
+            storePassword 'everitoken'
+            keyAlias = 'vctc_release'
+            keyPassword 'everitoken'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         minSdkVersion 19
@@ -8,6 +16,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
     compileOptions {
         sourceCompatibility 1.8
