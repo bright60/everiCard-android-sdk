@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">everiCard SDK Demo</string>
     <string name="mainBtn">Button</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_settings">S</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

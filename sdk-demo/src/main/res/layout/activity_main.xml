@@ -150,7 +150,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:elevation="16dp"
-            android:text="S"
+            android:text="@string/title_activity_settings"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@android:color/white" />
     </FrameLayout>
