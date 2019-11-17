@@ -45,9 +45,11 @@ public class Card {
 
         byte[] ret = channel.sendCommand(command);
         Response res = Response.of(ret);
+        byte[] status = res.getStatus();
+        String statusText = Utils.HEX.encode(status);
 
         if (!res.isSuccessful()) {
-            throw new VCChipException("create_key_with_index_symbolId", String.format("Failed to create key for symbol %d at index %d", symbolId, index));
+            throw new VCChipException("create_key_with_index_symbolId", String.format("Failed to create key for symbol %d at index %d (%s)", symbolId, index, statusText));
         }
     }
 
@@ -67,9 +69,24 @@ public class Card {
 
         byte[] ret = channel.sendCommand(publicKeyRead);
         Response res = Response.of(ret);
+        String statusText = Utils.HEX.encode(res.getStatus());
 
         if (!res.isSuccessful()) {
-            throw new VCChipException("get_publicKey_fail", String.format("could not get public key at index %s", keyIndex));
+            throw new VCChipException("get_publicKey_fail", String.format("could not get public key at index %s (%s)", keyIndex, statusText));
+        }
+
+        return new PublicKey(res.getContent());
+    }
+
+    public PublicKey getPublicKeyByIndex(int keyIndex) throws VCChipException {
+        PublicKeyRead publicKeyRead = PublicKeyRead.byIndex(keyIndex);
+
+        byte[] ret = channel.sendCommand(publicKeyRead);
+        Response res = Response.of(ret);
+        String statusText = Utils.HEX.encode(res.getStatus());
+
+        if (!res.isSuccessful()) {
+            throw new VCChipException("get_publicKey_fail", String.format("could not get public key at index %s (%s)", keyIndex, statusText));
         }
 
         return new PublicKey(res.getContent());
@@ -202,10 +219,10 @@ public class Card {
         return Utils.HEX.encode(res.getSeed());
     }
 
-    public Signature signHash(byte[] hash, int keyIndex, int symbolId) throws VCChipException {
+    public Signature signHash(byte[] hash, int keyIndex) throws VCChipException {
         SignHash command = SignHash.of(keyIndex, hash);
-        PublicKey publicKey = getPublicKeyByIndexAndSymbolId(keyIndex, symbolId);
-        System.out.println(publicKey.toString());
+        PublicKey publicKey = getPublicKeyByIndex(keyIndex);
+
         Signer signer = new Signer(channel);
         return signer.sign(command, publicKey, true);
     }

@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
         try {
             if (card != null) {
                 if (command.equals("get_pubkey_0")) {
-                    this.outputText.setText(card.getPublicKeyByIndexAndSymbolId(index, symbolId).toString());
+                    this.outputText.setText(card.getPublicKeyByIndex(index).toString());
                 } else if (command.equals("get_display_name")) {
                     this.outputText.setText(StringEscapeUtils.unescapeXml(card.getDisplayName()));
                 } else if (command.equals("set_display_name")) {
@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                         public void onClick(DialogInterface dialog, int which) {
                             String signingHash = hash.getText().toString();
                             try {
-                                Signature signature = card.signHash(Utils.hash(Utils.HEX.decode(signingHash)), 0, 207);
+                                Signature signature = card.signHash(Utils.hash(Utils.HEX.decode(signingHash)), 0);
                                 outputText.setText(signature.toString());
                             } catch (VCChipException e) {
                                 Toast.makeText(ctx, e.toString(), Toast.LENGTH_LONG).show();
@@ -361,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
             TransactionDigest trxDigest = TransactionService.getTransactionSignableDigest(netParams, rawTrx);
             writeLog(String.format("getting hash: %s", Utils.HEX.encode(trxDigest.getDigest())));
 
-            Signature signature = card.signHash(trxDigest.getDigest(), 0, 207);
+            Signature signature = card.signHash(trxDigest.getDigest(), 0);
             writeLog(signature.toString());
 
             // Push the raw transaction together with the signature to chain
