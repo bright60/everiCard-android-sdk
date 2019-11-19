@@ -227,6 +227,14 @@ public class Card {
         return signer.sign(command, publicKey, true);
     }
 
+    public Signature signHash(byte[] hash, int keyIndex, int symbolId) throws VCChipException {
+        SignHash command = SignHash.of(keyIndex, hash);
+        PublicKey publicKey = getPublicKeyByIndexAndSymbolId(keyIndex, symbolId);
+
+        Signer signer = new Signer(channel);
+        return signer.sign(command, publicKey, true);
+    }
+
     // TODO
     public List<Signature> signTransaction(Transaction trx, int keyIndex) {
         return new ArrayList<>();
