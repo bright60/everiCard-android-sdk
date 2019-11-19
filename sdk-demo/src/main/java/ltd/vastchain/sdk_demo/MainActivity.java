@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements CardManager.OnCar
                     card.createKeyWithIndexAndSymbolId(index, symbolId, false);
                     outputText.setText(String.format("Created key with index (%s) and symbolId (%s)", index, symbolId));
                 } else if (command.equals("configure_key_by_index")) {
-                    card.confitureKeyWithIndex(index);
+                    card.configureKeyWithIndex(index);
                     outputText.setText(String.format("Set key with index %d", index));
                 } else {
                     Toast.makeText(this, String.format("Command '%s' is not handled", command), Toast.LENGTH_LONG).show();

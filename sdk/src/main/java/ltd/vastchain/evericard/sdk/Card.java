@@ -53,7 +53,7 @@ public class Card {
         }
     }
 
-    public void confitureKeyWithIndex(int index) throws VCChipException {
+    public void configureKeyWithIndex(int index) throws VCChipException {
         PrivateKeyFileConfigure command = PrivateKeyFileConfigure.generateInternalKey(index);
 
         byte[] ret = channel.sendCommand(command);
